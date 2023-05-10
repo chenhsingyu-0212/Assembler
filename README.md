@@ -1,4 +1,4 @@
-# Assembler
+# Assembler with Java
 
 ## Description
 use java to writer the assembler
@@ -19,4 +19,4 @@ java src/Java/Assembler "Figure 2.15.txt" "OutputFile.txt"
 - **First line**: complier all `.java` file.
 - **Second line**: run Assembler file, the first string `"Figure 2.15.txt"` is inputFile name and second string `"OutputFile.txt"` is outputFile name.
 
-You can try to change this file to get what you need in file name.
+You can try to change this file to get what file name you need.
