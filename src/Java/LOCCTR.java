@@ -66,7 +66,7 @@ public class LOCCTR {
                 int len = 0;
                 for(String v : value){
                     try {
-                        Integer number = Integer.parseInt(v);
+                        Integer.parseInt(v);
                     } catch (Exception e) {
                         // TODO: handle exception
                         len++;

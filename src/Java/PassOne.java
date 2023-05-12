@@ -13,12 +13,12 @@ public class PassOne {
         loc = new ArrayList<>();
 
         // LTORG
-        LTORG ltorg = new LTORG();
+        ltorg = new LTORG();
         ltorg.process(rawDatas);
         data = ltorg.getData();
 
         // LOCCTR
-        LOCCTR locctr = new LOCCTR();
+        locctr = new LOCCTR();
         locctr.create(data);
         loc = locctr.getLOC();
     }
