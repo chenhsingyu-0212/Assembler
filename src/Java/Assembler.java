@@ -4,22 +4,27 @@ import java.util.ArrayList;
 
 public class Assembler {
     public static void main(String[] args) {
-        // ReaderFile inputFile = new ReaderFile("Figure 2.15.txt");
-        ReaderFile inputFile = new ReaderFile(args[0]);
-        ArrayList<String> line = inputFile.readerLine();
+        // ReaderFile
+        // ReaderFile inputFile = new ReaderFile(args[0]);
+        ReaderFile inputFile = new ReaderFile("Figure 2.15.txt");
+        ArrayList<String[]> rawDatas = inputFile.readerLine();
 
-        // WriterFile outputFile = new WriterFile("OutputFile.txt");
-        WriterFile outputFile = new WriterFile(args[1]);
-        ArrayList<String> ans = new ArrayList<>();
+        // Test Start
+        // LTORG
+        PassOne passOne = new PassOne(rawDatas);
 
-        for(String l : line){
-            String[] arr = l.split("    ");
-            for(String a : arr){
-                ans.add(a);
-            }
-            ans.add("\n");
-        }
+        // Data Process
+        DataProcess dataProcess = new DataProcess(passOne.getData(), passOne.getLOC());
+        // Test End
 
-        outputFile.writerLine(ans);
+        // WriterFile Figure 2.16
+        // WriterFile outputFile_2_16 = new WriterFile(args[1]);
+        WriterFile outputFile_2_16 = new WriterFile("OP_Code.txt");
+        outputFile_2_16.writerLine(dataProcess.getData(false));
+
+        // WriterFile Figure 2.17
+        // WriterFile outputFile_2_17 = new WriterFile(args[2]);
+        WriterFile outputFile_2_17 = new WriterFile("OP_Program.txt");
+        outputFile_2_17.writerLine(dataProcess.getData(true));
     }
 }
