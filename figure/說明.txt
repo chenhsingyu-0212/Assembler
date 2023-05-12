@@ -1,0 +1,7 @@
+系統程式課程期末Assembler設計專題評分說明
+
+1.	接受Figure 2.1，能產生Figure 2.2者60分，同時能產生Figure 2.3者70分。--- SIC
+2.	接受Figure 2.5，能產生Figure 2.6者70分，同時能產生Figure 2.8者80分。--- SIC/XE
+3.	接受Figure 2.9，能產生Figure 2.10者80分。--- literal
+4.	接受Figure 2.11，能產生Figure 2.12與Figure2.13者90分。--- program block
+5.	接受Figure 2.15，能產生Figure 2.16與Figure2.17者100分。--- control section
