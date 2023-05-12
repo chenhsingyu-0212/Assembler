@@ -1,5 +1,6 @@
 import sys
+from pass1 import pass1
 
 asm = sys.argv[0]
 
-file = open(asm, encoding="utf-8")
+pass1(asm)
