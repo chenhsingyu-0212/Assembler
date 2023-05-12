@@ -18,11 +18,7 @@ public class WriterFile {
             FileWriter writer = new FileWriter(file);
             writer.write("");
             for(String l : res){
-                if(l.equals("\n")){
-                    writer.append(l);
-                }else{
-                    writer.append(l + " ");
-                }
+                writer.append(l + "\n");
             }
             writer.close();
         } catch (Exception e) {

@@ -13,15 +13,19 @@ public class ReaderFile {
         this.path = path;
     }
 
-    public ArrayList<String> readerLine(){
-        ArrayList<String> res = new ArrayList<>();
+    public ArrayList<String[]> readerLine(){
+        ArrayList<String[]> res = new ArrayList<>();
         
         try {
             FileReader reader = new FileReader(file);
             BufferedReader source = new BufferedReader(reader);
             for(String l = source.readLine(); l != null ; l = source.readLine()){
                 if(l.length() != 0){
-                    res.add(l);
+                    String[] arr = l.split("\t");
+                    res.add(arr);
+                }else{
+                    String[] arr = {" "};
+                    res.add(arr);
                 }
             }
             reader.close();
