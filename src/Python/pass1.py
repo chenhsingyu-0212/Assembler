@@ -1,4 +1,5 @@
-LOC = 0
+STARTING = 0
+LOCCTR = 0
 
 
 def split_inst(line: str):
@@ -17,8 +18,15 @@ def split_inst(line: str):
 
 
 def pass1(path: str):
+    global STARTING, LOCCTR
     with open(path, encoding="utf-8") as f:
-        w = open("test.txt", "w", encoding="utf-8")
+        first_line = split_inst(next(f))
+        if first_line["OPCODE"] == "START":
+            STARTING = first_line["OPERAND"]
+            LOCCTR = STARTING
+        else:
+            LOCCTR = 0
+        w = open("./test.txt", "w", encoding="utf-8")
         for line in f:
             tokens = split_inst(line)
             w.write(" ".join(tokens))
@@ -26,4 +34,4 @@ def pass1(path: str):
         w.close()
 
 
-pass1("Figure 2.15.txt")
+pass1("../../figure/Figure2.5.txt")
