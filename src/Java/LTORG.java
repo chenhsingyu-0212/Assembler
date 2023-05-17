@@ -3,7 +3,7 @@ package src.Java;
 import java.util.ArrayList;
 
 public class LTORG {
-    ArrayList<String[]> res;
+    private ArrayList<String[]> res;
 
     public LTORG(){
         res = new ArrayList<>();

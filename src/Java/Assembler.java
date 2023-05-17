@@ -10,11 +10,13 @@ public class Assembler {
         ArrayList<String[]> rawDatas = inputFile.readerLine();
 
         // Test Start
-        // LTORG
+        // PassOne -> LTORG -> LOCCTR
         PassOne passOne = new PassOne(rawDatas);
+        PassTwo passTwo = new PassTwo(passOne.getData(), passOne.getLOC(), passOne.getFormat(), passOne.getSYMTAB());
 
         // Data Process
-        DataProcess dataProcess = new DataProcess(passOne.getData(), passOne.getLOC());
+        DataProcess dataProcess = new DataProcess();
+        dataProcess.opCode(passOne.getData(), passOne.getLOC(), passTwo.getOPCode());
         // Test End
 
         // WriterFile Figure 2.16

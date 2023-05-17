@@ -5,12 +5,10 @@ import java.io.FileReader;
 import java.util.ArrayList;
 
 public class ReaderFile {
-    File file;
-    String path;
+    private File file;
 
     public ReaderFile(String path){
         this.file = new File(path);
-        this.path = path;
     }
 
     public ArrayList<String[]> readerLine(){

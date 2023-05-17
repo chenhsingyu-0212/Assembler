@@ -5,12 +5,10 @@ import java.io.FileWriter;
 import java.util.ArrayList;
 
 public class WriterFile {
-    File file;
-    String path;
+    private File file;
 
     public WriterFile(String path){
         this.file = new File(path);
-        this.path = path;
     }
 
     public void writerLine(ArrayList<String> res){
