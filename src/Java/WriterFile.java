@@ -16,7 +16,7 @@ public class WriterFile {
             FileWriter writer = new FileWriter(file);
             writer.write("");
             for(String l : res){
-                writer.append(l + "\n");
+                writer.append(l.toUpperCase() + "\n");
             }
             writer.close();
         } catch (Exception e) {

@@ -10,6 +10,7 @@ public class PassOne {
     private ArrayList<String> loc;
     private ArrayList<Integer> format;
     private Map<String, String> symtab;
+    private ArrayList<String> total;
 
     public PassOne(ArrayList<String[]> rawDatas) {
         data = new ArrayList<>();
@@ -27,6 +28,7 @@ public class PassOne {
         loc = locctr.getLOC();
         format = locctr.getFormat();
         symtab = locctr.getSYMTAB();
+        total = locctr.getTotal();
     }
 
     public ArrayList<String[]> getData(){
@@ -43,5 +45,9 @@ public class PassOne {
 
     public Map<String, String> getSYMTAB(){
         return symtab;
+    }
+
+    public ArrayList<String> getTotal(){
+        return total;
     }
 }

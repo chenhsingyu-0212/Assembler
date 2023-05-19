@@ -17,6 +17,8 @@ public class Assembler {
         // Data Process
         DataProcess dataProcess = new DataProcess();
         dataProcess.opCode(passOne.getData(), passOne.getLOC(), passTwo.getOPCode());
+        dataProcess.opProgram(passOne.getData(), passOne.getLOC(), passOne.getSYMTAB(), passOne.getTotal(),
+                passTwo.getOPCode(), passTwo.getMod());
         // Test End
 
         // WriterFile Figure 2.16

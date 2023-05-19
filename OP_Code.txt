@@ -1,4 +1,4 @@
-Loc     Source statement                        Object code    
+LOC     SOURCE STATEMENT                        OBJECT CODE    
 0000    COPY    START   0                                      
                 EXTDEF  BUFFER,BUFEND,LENGTH                   
                 EXTREF  RDREC,WRREC                            

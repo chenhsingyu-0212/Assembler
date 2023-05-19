@@ -9,12 +9,18 @@ public class LOCCTR {
     private Map<String, String> symtab;
     private ArrayList<String> res;
     private ArrayList<Integer> format;
+    private ArrayList<String> total;
 
     public LOCCTR() {
         res = new ArrayList<>();
         format = new ArrayList<>();
         optab = new OPTAB();
         symtab = new HashMap<>();
+        total = new ArrayList<>();
+    }
+
+    public ArrayList<String> getTotal(){
+        return total;
     }
 
     public Map<String, String> getSYMTAB(){
@@ -36,6 +42,7 @@ public class LOCCTR {
 
         for (String[] data : datas) {
             if (data.length >= 2 && (data[1].equals("START") || data[1].equals("CSECT"))) {
+                total.add(loc);
                 loc = "0000";
                 res.add(loc);
                 format.add(0);
@@ -88,7 +95,7 @@ public class LOCCTR {
                 }
             } else if (data.length >= 2 && data[1].equals("EQU")) {
                 String[] value = data[2].split("-");
-                String[] sign = data[2].split("[^A-Za-z]");
+                String[] sign = data[2].split("[A-Za-z]");
                 boolean isAbsolute = true;
 
                 int len = 0;
@@ -149,5 +156,8 @@ public class LOCCTR {
                 }
             }
         }
+
+        total.add(loc);
+        total.remove(0);
     }
 }
