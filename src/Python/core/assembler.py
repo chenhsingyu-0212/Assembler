@@ -3,8 +3,11 @@ from core.section import Section
 
 
 class Assembler:
-    sections: list[Section] = []
+    sections: list[Section]
     __slots__ = tuple(__annotations__)
+
+    def __init__(self):
+        self.sections = []
 
     def parse(self, file: str):
         s = Section("COPY")

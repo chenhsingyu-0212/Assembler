@@ -7,7 +7,7 @@ class RawLine:
     operator: str
     operand: str
     addr: int
-    is_comment: bool = False
+    is_comment: bool
     __slots__ = tuple(__annotations__)
 
     def __init__(self, line: str):
@@ -20,6 +20,7 @@ def tokenize(obj: RawLine):
         obj.is_comment = True
         obj.label, obj.operator, obj.operand = "", "", ""
     else:
+        obj.is_comment = False
         tokens = list(obj.line.split())
         if len(tokens) == 3:
             obj.label, obj.operator, obj.operand = tokens[0], tokens[1], tokens[2]
