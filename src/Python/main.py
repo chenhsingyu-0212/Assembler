@@ -17,3 +17,4 @@ if __name__ == "__main__":
         filename = path[: path.rfind(".")]
 
     a = Assembler()
+    a.parse(path)

@@ -3,7 +3,7 @@ from core.line import Line
 
 class Section:
     name: str
-    lines: list[Line]
+    lines: list[Line | str]
     __slots__ = tuple(__annotations__)
 
     def __init__(self, name: str):
