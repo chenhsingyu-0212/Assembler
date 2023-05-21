@@ -8,6 +8,8 @@ class RawLine:
     operand: str
     addr: int
     is_comment: bool
+    format: int
+    opcode: int
     __slots__ = tuple(__annotations__)
 
     def __init__(self, line: str):
