@@ -20,7 +20,7 @@ class Section:
         self.symbol_table = SymbolTable()
 
     def analyze_symbol(self, line: RawLine):
-        if line in OPCODE:
+        if line.operator.replace("+", "") in OPCODE:
             self.analyze_operator(line)
         else:
             self.analyze_directive(line)
@@ -37,7 +37,8 @@ class Section:
         token = line.operator
         if token not in DIRECTIVE:
             sys.exit(f'Error: invalid operator "{token}".')
-        elif token == "RESW":
+        line.format = DIRECTIVE[token]["format"]
+        if token == "RESW":
             self.locctr += 3 * int(line.operand)
         elif token == "WORD":
             self.locctr += 3
@@ -56,11 +57,12 @@ class Section:
             self.locctr = int(l.operand, 16)
             next(lines)
         for l in lines:
-            l.addr = self.locctr
             if l.operator == "END":
-                pass
+                break
+            l.addr = self.locctr
             if l.label != "":
                 if self.symbol_table[l.label] is not None:
                     sys.exit("Error: defining duplicate symbol.")
                 self.symbol_table[l.label] = self.locctr
-            self.analyze_operator(l)
+            if l.operator != "":
+                self.analyze_symbol(l)
