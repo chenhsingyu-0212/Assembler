@@ -11,6 +11,8 @@ class Section:
     lines: list[RawLine]
     locctr: int
     symbol_table: SymbolTable
+    start_addr: int
+    length: int
     __slots__ = tuple(__annotations__)
 
     def __init__(self, name: str):
@@ -18,6 +20,7 @@ class Section:
         self.lines = []
         self.locctr = 0
         self.symbol_table = SymbolTable()
+        self.start_addr = 0
 
     def analyze_symbol(self, line: RawLine):
         if line.operator.replace("+", "") in OPCODE:
@@ -54,8 +57,10 @@ class Section:
         lines = iter(self.lines)
         l = self.lines[0]
         if l.operator == "START":
-            self.locctr = int(l.operand, 16)
+            self.locctr = self.start_addr = int(l.operand, 16)
             next(lines)
+        else:
+            self.locctr = self.start_addr = 0
         for l in lines:
             if l.operator == "END":
                 break
@@ -66,3 +71,4 @@ class Section:
                 self.symbol_table[l.label] = self.locctr
             if l.operator != "":
                 self.analyze_symbol(l)
+        self.length = self.locctr - self.start_addr
