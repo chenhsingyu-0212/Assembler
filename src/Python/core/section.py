@@ -13,6 +13,7 @@ class Section:
     symbol_table: SymbolTable
     start_addr: int
     length: int
+    base: str
     __slots__ = tuple(__annotations__)
 
     def __init__(self, name: str):
@@ -21,6 +22,7 @@ class Section:
         self.locctr = 0
         self.symbol_table = SymbolTable()
         self.start_addr = 0
+        self.base = ""
 
     def analyze_symbol(self, line: RawLine):
         if line.operator.replace("+", "") in OPCODE:
@@ -52,6 +54,8 @@ class Section:
                 self.locctr += len(line.operand[2:-1])
             elif line.operand[0] == "X":
                 self.locctr += math.ceil(len(line.operand[2:-1]) / 2)
+        elif token == "BASE":
+            self.base = line.operand
 
     def pass1(self):
         lines = iter(self.lines)
