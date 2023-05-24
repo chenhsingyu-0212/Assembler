@@ -1,4 +1,4 @@
-from core.lexer import RawLine
+from core.line import RawLine
 from core.section import Section
 
 

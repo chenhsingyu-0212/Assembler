@@ -1,7 +1,7 @@
 import math
 import sys
 
-from core.lexer import RawLine
+from core.line import RawLine
 from core.mnemonics import DIRECTIVE, OPCODE
 from core.table import SymbolTable
 
