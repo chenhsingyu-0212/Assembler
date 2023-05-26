@@ -89,6 +89,7 @@ disable=abstract-method,
         long-suffix,
         map-builtin-not-iterating,
         misplaced-comparison-constant,
+        missing-class-docstring,
         missing-function-docstring,
         missing-module-docstring,
         metaclass-assignment,
@@ -314,7 +315,7 @@ dummy-variables-rgx=^\*{0,2}(_$|unused_|dummy_)
 
 # List of additional names supposed to be defined in builtins. Remember that
 # you should avoid to define new builtins when possible.
-additional-builtins=
+additional-builtins=__annotations__
 
 # List of strings which can identify a callback function by name. A callback
 # name must start or end with one of those strings.
