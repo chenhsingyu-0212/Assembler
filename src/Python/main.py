@@ -18,3 +18,4 @@ if __name__ == "__main__":
 
     a = Assembler()
     a.parse(path)
+    a.execute(filename)

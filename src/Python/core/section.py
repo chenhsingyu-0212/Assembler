@@ -104,3 +104,27 @@ class Section:
             # relocation record
             if l.operator[0] == "+" and l.operand[0] != "#":
                 self.object_code.append_mod(l.addr, 5)
+
+    def create_object_program(self, file: str):
+        with open(f"{file}.prog", "w", encoding="utf-8") as f:
+            for l in self.lines:
+                if l.operator == "":
+                    f.write(f"{l.line}")
+                    continue
+                addr = getattr(l, "addr", "")
+                if addr != "":
+                    addr = f"{addr:04X}"
+                obj = getattr(l, "obj_code", "")
+                if obj != "":
+                    obj = f"{obj:X}"
+                f.write(f"{addr} {l.label:6} {l.operator:6} {l.operand:6} {obj}\n")
+            f.close()
+
+    def create_object_code(self, file: str):
+        self.create_object_program(file)
+        with open(f"{file}.obj", "w", encoding="utf-8") as f:
+            f.write(str(self.object_code.header))
+            f.write("".join(map(str, self.object_code.texts)))
+            f.write("".join(map(str, self.object_code.mods)))
+            f.write(str(self.object_code.end))
+            f.close()

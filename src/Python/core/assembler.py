@@ -15,3 +15,9 @@ class Assembler:
         with open(file, "r", encoding="utf-8") as f:
             for line in f:
                 s.lines.append(RawLine(line))
+
+    def execute(self, file: str):
+        for s in self.sections:
+            s.pass1()
+            s.pass2()
+            s.create_object_code(file)
