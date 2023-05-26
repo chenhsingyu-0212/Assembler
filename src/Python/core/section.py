@@ -3,6 +3,7 @@ import sys
 
 from core.line import RawLine
 from core.mnemonics import DIRECTIVE, OPCODE
+from core.object_code import ObjectCode
 from core.table import SymbolTable
 
 
@@ -14,6 +15,7 @@ class Section:
     start_addr: int
     length: int
     base: str
+    object_code: ObjectCode
     __slots__ = tuple(__annotations__)
 
     def __init__(self, name: str):
@@ -23,6 +25,7 @@ class Section:
         self.symbol_table = SymbolTable()
         self.start_addr = 0
         self.base = ""
+        self.object_code = ObjectCode()
 
     def analyze_symbol(self, line: RawLine):
         if line.operator.replace("+", "") in OPCODE:
@@ -34,9 +37,8 @@ class Section:
         token = line.operator.replace("+", "")
         line.format, line.opcode = OPCODE[token]["format"], OPCODE[token]["opcode"]
         if line.operator[0] == "+":
-            self.locctr += 4
-        else:
-            self.locctr += line.format
+            line.format = 4
+        self.locctr += line.format
 
     def analyze_directive(self, line: RawLine):
         token = line.operator
@@ -61,7 +63,7 @@ class Section:
         lines = iter(self.lines)
         l = self.lines[0]
         if l.operator == "START":
-            self.locctr = self.start_addr = int(l.operand, 16)
+            self.locctr = self.start_addr = l.addr = int(l.operand, 16)
             next(lines)
         else:
             self.locctr = self.start_addr = 0
@@ -76,3 +78,29 @@ class Section:
             if l.operator != "":
                 self.analyze_symbol(l)
         self.length = self.locctr - self.start_addr
+
+    def pass2(self):
+        n = len(self.lines) - 1
+        l = self.lines[0]
+        if l.operator == "START":
+            self.object_code.set_header(l.label, self.start_addr, self.length)
+            start = 1
+        else:
+            self.object_code.set_header("COPY", self.start_addr, self.length)
+            start = 0
+        for i, l in enumerate(self.lines, start):
+            if l.operator == "":
+                continue
+            if l.operator == "END":
+                self.object_code.set_end(self.start_addr)
+                break
+            l.generate_objcode(self.symbol_table, self.symbol_table[self.base])
+
+            if i < n:
+                self.object_code.append_text(l, self.lines[i])
+            else:
+                self.object_code.append_text(l, None)  # last line of the section
+
+            # relocation record
+            if l.operator[0] == "+" and l.operand[0] != "#":
+                self.object_code.append_mod(l.addr, 5)
