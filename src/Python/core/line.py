@@ -1,5 +1,6 @@
 import re
 
+from core.mnemonics import DIRECTIVE
 from core.table import SymbolTable
 
 
@@ -22,16 +23,32 @@ class RawLine:
         if self.operand != "":
             self.operands = list(self.operand.split(","))
 
+    def count_disp(self, target_address: int, base: int) -> tuple[int]:
+        """return (disp, b, p)"""
+        if target_address is None:
+            return 0, 0, 0
+
+        addr = self.addr + self.format
+        if -2048 < target_address - addr < 0:
+            return 0x1000 + target_address - addr, 0, 1  # 2's complement
+        elif 0 <= target_address - addr < 2048:
+            return target_address - addr, 0, 1
+        return target_address - base, 1, 0
+
     def generate_objcode(self, symbol_table: SymbolTable, base: int):
         opcode = getattr(self, "opcode", None)
-        if opcode is None:
+        if self.operator in DIRECTIVE or opcode is None:
             if self.operator == "BYTE":
                 if self.operand[0] == "C":
                     self.obj_code = int(self.operand[2:-1].encode("utf-8").hex(), 16)
+                    self.format = len(self.operand[2:-1])
                 elif self.operand[0] == "X":
                     self.obj_code = int(self.operand[2:-1], 16)
+                    self.format = len(self.operand[2:-1]) // 2
             elif self.operator == "WORD":
                 self.obj_code = int(self.operand)
+                self.format = (int(self.operand).bit_length() + 7) // 8
+            return
         if self.format == 3:
             # n => indirect addressing
             # i => immediate addressing
@@ -39,42 +56,64 @@ class RawLine:
             # b => base relative addressing
             # p => pc relative addressing
             # e => extended addressing
-            n, i, x, b, p, e = 1, 1, 0, 0, 0, 0
-            target_address = symbol_table[self.operands[0]]
-            if self.operands[0][0] == "@":
-                n, i = 1, 0
-            elif self.operands[0][0] == "#":
-                n, i = 0, 1
-            elif self.operands[0][0] == "+":
-                n, i, e = 1, 1, 1
+            if self.operator == "RSUB":
+                self.obj_code = 0x4F0000
+                return
+            n, i, x, b, p = 1, 1, 0, 0, 0
 
-            if self.operands[1] == "X":
+            # addressing mode
+            if self.operand[0] == "@":
+                n, i = 1, 0
+                disp, b, p = self.count_disp(symbol_table[self.operand[1:]], base)
+            elif self.operand[0] == "#":
+                n, i = 0, 1
+                if self.operand[1:].isnumeric():
+                    disp = int(self.operand[1:])
+                else:
+                    disp, b, p = self.count_disp(symbol_table[self.operand[1:]], base)
+            else:
+                disp, b, p = self.count_disp(symbol_table[self.operands[0]], base)
+
+            # indexing
+            if self.operand[-1] == "X":
                 x = 1
 
-            if target_address is None:
-                disp = 0
-            elif n == 1 and i == 1:  # simple addressing
-                disp = target_address
-            elif -2048 <= self.addr - target_address <= 2047:  # base relative
-                disp = target_address - self.addr
-                p = 1
+            self.obj_code = (
+                (opcode << 16) + (n << 17) + (i << 16) + (x << 15) + (b << 14) + (p << 13) + disp
+            )
+        elif self.format == 4:
+            n, i, x, b, p = 1, 1, 0, 0, 0
+            if self.operand[0] == "#":
+                if self.operand[1:].isnumeric():
+                    disp = int(self.operand[1:])
+                else:
+                    disp = symbol_table[self.operand[1:]]
             else:
-                disp = target_address - base
-                b = 1
+                disp = symbol_table[self.operands[0]]
 
-            if e:  # is format 4
-                self.obj_code = (
-                    opcode << 24 + n << 26 + i << 25 + x << 23 + b << 22 + p << 21 + e << 20 + disp
-                )
-            else:
-                self.obj_code = (
-                    opcode << 16 + n << 17 + i << 16 + x << 15 + b << 14 + p << 13 + disp
-                )
+            if self.operand[-1] == "X":
+                x = 1
+
+            self.obj_code = (
+                (opcode << 24)
+                + (n << 25)
+                + (i << 24)
+                + (x << 23)
+                + (b << 22)
+                + (p << 21)
+                + (1 << 20)
+                + disp
+            )
+
         elif self.format == 2:
             if len(self.operands) == 1:
-                self.obj_code = opcode << 8 + self.operands[0] << 4
+                self.obj_code = (opcode << 8) + (symbol_table[self.operands[0]] << 4)
             else:
-                self.obj_code = opcode << 8 + self.operands[0] << 4 + self.operands[1]
+                self.obj_code = (
+                    (opcode << 8)
+                    + (symbol_table[self.operands[0]] << 4)
+                    + symbol_table[self.operands[1]]
+                )
         elif self.format == 1:
             self.obj_code = self.opcode
 
