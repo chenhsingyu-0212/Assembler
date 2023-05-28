@@ -12,6 +12,7 @@ class Section:
     lines: list[RawLine]
     locctr: int
     symbol_table: SymbolTable
+    literal_table: list[str]
     start_addr: int
     length: int
     base: str
@@ -23,12 +24,18 @@ class Section:
         self.lines = []
         self.locctr = 0
         self.symbol_table = SymbolTable()
+        self.literal_table = []
         self.start_addr = 0
         self.base = ""
         self.object_code = ObjectCode()
 
     def analyze_symbol(self, line: RawLine):
-        if line.operator.replace("+", "") in OPCODE:
+        if line.operator[0] == "=":
+            if line.operator[1] == "C":
+                self.locctr += len(line.operator[3:-1])
+            elif line.operator[1] == "X":
+                self.locctr += math.ceil(len(line.operator[3:-1]) / 2)
+        elif line.operator.replace("+", "") in OPCODE:
             self.analyze_operator(line)
         else:
             self.analyze_directive(line)
@@ -59,6 +66,11 @@ class Section:
         elif token == "BASE":
             self.base = line.operand
 
+    def create_literal_lines(self):
+        for literal in self.literal_table:
+            self.lines.append(RawLine.create_line("*", f"={literal}", ""))
+        self.literal_table = []
+
     def pass1(self):
         lines = iter(self.lines)
         l = self.lines[0]
@@ -71,7 +83,9 @@ class Section:
             if l.operator == "END":
                 continue
             l.addr = self.locctr
-            if l.label != "":
+            if l.label == "*":
+                self.symbol_table[l.operator[1:]] = self.locctr
+            elif l.label != "":
                 if self.symbol_table[l.label] is not None:
                     sys.exit("Error: defining duplicate symbol.")
                 self.symbol_table[l.label] = self.locctr

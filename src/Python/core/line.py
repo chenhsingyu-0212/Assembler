@@ -23,6 +23,17 @@ class RawLine:
         if self.operand != "":
             self.operands = list(self.operand.split(","))
 
+    @classmethod
+    def create_line(cls, label: str, operator: str, operand: str):
+        line = cls("")
+        line.label, line.operator, line.operand = label, operator, operand
+        return line
+
+    def add_literal(self, literal_table: list, symbol_table: SymbolTable):
+        token = self.operand[1:]
+        if symbol_table[token] is None and token not in literal_table:
+            literal_table.append(token)
+
     def count_disp(self, target_address: int, base: int) -> tuple[int]:
         """return (disp, b, p)"""
         if target_address is None:
@@ -48,6 +59,13 @@ class RawLine:
             elif self.operator == "WORD":
                 self.obj_code = int(self.operand)
                 self.format = (int(self.operand).bit_length() + 7) // 8
+            elif self.operator[0] == "=":
+                if self.operator[1] == "C":
+                    self.obj_code = int(self.operator[3:-1].encode("utf-8").hex(), 16)
+                    self.format = len(self.operator[3:-1])
+                elif self.operator[1] == "X":
+                    self.obj_code = int(self.operator[3:-1], 16)
+                    self.format = len(self.operator[3:-1]) // 2
             return
         if self.format == 3:
             # n => indirect addressing
@@ -71,6 +89,8 @@ class RawLine:
                     disp = int(self.operand[1:])
                 else:
                     disp, b, p = self.count_disp(symbol_table[self.operand[1:]], base)
+            elif self.operand[0] == "=":
+                disp, b, p = self.count_disp(symbol_table[self.operand[1:]], base)
             else:
                 disp, b, p = self.count_disp(symbol_table[self.operands[0]], base)
 
