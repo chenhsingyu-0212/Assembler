@@ -124,13 +124,14 @@ def tokenize(obj: RawLine):
         obj.is_comment = True
         obj.label, obj.operator, obj.operand = "", "", ""
     else:
+        line = re.sub(r"\s*,\s*X", ",X", obj.line)
         obj.is_comment = False
-        tokens = list(obj.line.split())
+        tokens = list(line.split())
         if len(tokens) == 3:
             obj.label, obj.operator, obj.operand = tokens[0], tokens[1], tokens[2]
         elif len(tokens) == 2:
             obj.label, obj.operator, obj.operand = "", tokens[0], tokens[1]
         elif len(tokens) == 1:
             obj.label, obj.operator, obj.operand = "", tokens[0], ""
-        elif len(tokens) == 1:
+        elif len(tokens) == 0:
             obj.label, obj.operator, obj.operand = "", "", ""
