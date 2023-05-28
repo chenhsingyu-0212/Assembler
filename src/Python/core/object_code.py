@@ -45,19 +45,19 @@ class TextRecord:
         self.object_code = []
 
     def __str__(self) -> str:
-        return f"T^{self.start_addr:06X}^{self.length:02X}^{''.join(self.object_code)}\n"
+        return f"T^{self.start_addr:06X}^{self.length:02X}^{'^'.join(self.object_code)}\n"
 
     def append_text(self, current_line: RawLine):
         # print(current_line.obj_code)
         self.length += current_line.format
         if current_line.format == 3:
-            self.object_code.append(f"{current_line.obj_code:06X}^")
+            self.object_code.append(f"{current_line.obj_code:06X}")
         elif current_line.format == 4:
-            self.object_code.append(f"{current_line.obj_code:08X}^")
+            self.object_code.append(f"{current_line.obj_code:08X}")
         elif current_line.format == 2:
-            self.object_code.append(f"{current_line.obj_code:04X}^")
+            self.object_code.append(f"{current_line.obj_code:04X}")
         elif current_line.format == 1:
-            self.object_code.append(f"{current_line.obj_code:02X}^")
+            self.object_code.append(f"{current_line.obj_code:02X}")
 
 
 class ModRecord:

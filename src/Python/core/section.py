@@ -12,6 +12,7 @@ class Section:
     lines: list[RawLine]
     locctr: int
     symbol_table: SymbolTable
+    literal_table: list[str]
     start_addr: int
     length: int
     base: str
@@ -23,12 +24,18 @@ class Section:
         self.lines = []
         self.locctr = 0
         self.symbol_table = SymbolTable()
+        self.literal_table = []
         self.start_addr = 0
         self.base = ""
         self.object_code = ObjectCode()
 
     def analyze_symbol(self, line: RawLine):
-        if line.operator.replace("+", "") in OPCODE:
+        if line.operator[0] == "=":
+            if line.operator[1] == "C":
+                self.locctr += len(line.operator[3:-1])
+            elif line.operator[1] == "X":
+                self.locctr += math.ceil(len(line.operator[3:-1]) / 2)
+        elif line.operator.replace("+", "") in OPCODE:
             self.analyze_operator(line)
         else:
             self.analyze_directive(line)
@@ -59,6 +66,11 @@ class Section:
         elif token == "BASE":
             self.base = line.operand
 
+    def create_literal_lines(self):
+        for literal in self.literal_table:
+            self.lines.append(RawLine.create_line("*", f"={literal}", ""))
+        self.literal_table = []
+
     def pass1(self):
         lines = iter(self.lines)
         l = self.lines[0]
@@ -69,9 +81,11 @@ class Section:
             self.locctr = self.start_addr = 0
         for l in lines:
             if l.operator == "END":
-                break
+                continue
             l.addr = self.locctr
-            if l.label != "":
+            if l.label == "*":
+                self.symbol_table[l.operator[1:]] = self.locctr
+            elif l.label != "":
                 if self.symbol_table[l.label] is not None:
                     sys.exit("Error: defining duplicate symbol.")
                 self.symbol_table[l.label] = self.locctr
@@ -93,7 +107,7 @@ class Section:
                 continue
             if l.operator == "END":
                 self.object_code.set_end(self.start_addr)
-                break
+                continue
             l.generate_objcode(self.symbol_table, self.symbol_table[self.base])
 
             if i < n:
@@ -112,12 +126,21 @@ class Section:
                     f.write(f"{l.line}")
                     continue
                 addr = getattr(l, "addr", "")
-                if addr != "":
+                if addr == "":
+                    addr = "    "
+                else:
                     addr = f"{addr:04X}"
                 obj = getattr(l, "obj_code", "")
                 if obj != "":
-                    obj = f"{obj:X}"
-                f.write(f"{addr} {l.label:6} {l.operator:6} {l.operand:6} {obj}\n")
+                    if l.format == 4:
+                        obj = f"{obj:08X}"
+                    elif l.format == 3:
+                        obj = f"{obj:06X}"
+                    elif l.format == 2:
+                        obj = f"{obj:04X}"
+                    elif l.format == 1:
+                        obj = f"{obj:02X}"
+                f.write(f"{addr}\t{l.label:6}\t{l.operator:6}\t{l.operand:8}\t{obj}\n")
             f.close()
 
     def create_object_code(self, file: str):
