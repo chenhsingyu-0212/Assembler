@@ -84,6 +84,7 @@ class RawLine:
         elif self.format == 4:
             n, i, x, b, p = 1, 1, 0, 0, 0
             if self.operand[0] == "#":
+                n, i = 0, 1
                 if self.operand[1:].isnumeric():
                     disp = int(self.operand[1:])
                 else:
