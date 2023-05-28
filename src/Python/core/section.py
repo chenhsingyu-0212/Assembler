@@ -112,12 +112,21 @@ class Section:
                     f.write(f"{l.line}")
                     continue
                 addr = getattr(l, "addr", "")
-                if addr != "":
+                if addr == "":
+                    addr = "    "
+                else:
                     addr = f"{addr:04X}"
                 obj = getattr(l, "obj_code", "")
                 if obj != "":
-                    obj = f"{obj:X}"
-                f.write(f"{addr} {l.label:6} {l.operator:6} {l.operand:6} {obj}\n")
+                    if l.format == 4:
+                        obj = f"{obj:08X}"
+                    elif l.format == 3:
+                        obj = f"{obj:06X}"
+                    elif l.format == 2:
+                        obj = f"{obj:04X}"
+                    elif l.format == 1:
+                        obj = f"{obj:02X}"
+                f.write(f"{addr}\t{l.label:6}\t{l.operator:6}\t{l.operand:8}\t{obj}\n")
             f.close()
 
     def create_object_code(self, file: str):
