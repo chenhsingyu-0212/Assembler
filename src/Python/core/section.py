@@ -69,7 +69,7 @@ class Section:
             self.locctr = self.start_addr = 0
         for l in lines:
             if l.operator == "END":
-                break
+                continue
             l.addr = self.locctr
             if l.label != "":
                 if self.symbol_table[l.label] is not None:
@@ -93,7 +93,7 @@ class Section:
                 continue
             if l.operator == "END":
                 self.object_code.set_end(self.start_addr)
-                break
+                continue
             l.generate_objcode(self.symbol_table, self.symbol_table[self.base])
 
             if i < n:
